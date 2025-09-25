@@ -5,7 +5,7 @@ import os
 # --- CONFIGURATION ---
 
 # Absolute path to your input root folder
-PCD_ROOT_FOLDER = r"C:\Users\Hazimi\OneDrive\CEEM222 MEC698 Internship\ground_calibration\data\Sample"
+PCD_ROOT_FOLDER = r"C:\Users\Hazimi\OneDrive\CEEM222 6M MEC698 Internship\ground_calibration\data"
 
 # Final rotation matrix (replace with your calibration matrix)
 FINAL_ROTATION_MATRIX = np.array([
@@ -15,13 +15,14 @@ FINAL_ROTATION_MATRIX = np.array([
 ])
 
 # Output folder INSIDE your PCD_ROOT_FOLDER
-OUTPUT_FOLDER = os.path.join(PCD_ROOT_FOLDER, "leveled_data")
+OUTPUT_FOLDER = os.path.join(PCD_ROOT_FOLDER, "leveled_data_ii")
 
 # --- FUNCTIONS ---
 
 def process_pcd_file(pcd_path, output_dir, rotation_matrix):
     """
-    Loads a PCD file, finds the lowest point, applies a rotation, and saves the result.
+    Loads a PCD file, applies a rotation around the global origin (0,0,0),
+    and saves the result.
     """
     try:
         pcd = o3d.io.read_point_cloud(pcd_path)
@@ -31,24 +32,14 @@ def process_pcd_file(pcd_path, output_dir, rotation_matrix):
             print(f"⚠️ Empty point cloud: {pcd_path}")
             return
 
-        # 1. Find the lowest point (pivot for rotation)
-        lowest_point_idx = np.argmin(points[:, 2])
-        lowest_point = points[lowest_point_idx, :]
+        # ✅ Rotate directly around the global origin (0,0,0)
+        rotated_points = points @ rotation_matrix.T
 
-        # 2. Translate so lowest point is at the origin
-        translated_points = points - lowest_point
-
-        # 3. Rotate
-        rotated_points = translated_points @ rotation_matrix.T
-
-        # 4. Translate back
-        leveled_points = rotated_points + lowest_point
-
-        # 5. Build new cloud
+        # Build new cloud
         leveled_pcd = o3d.geometry.PointCloud()
-        leveled_pcd.points = o3d.utility.Vector3dVector(leveled_points)
+        leveled_pcd.points = o3d.utility.Vector3dVector(rotated_points)
 
-        # 6. Save
+        # Save
         file_name = os.path.basename(pcd_path)
         output_path = os.path.join(output_dir, file_name)
         o3d.io.write_point_cloud(output_path, leveled_pcd)

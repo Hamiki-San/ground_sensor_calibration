@@ -10,3 +10,11 @@ This repository contains a Jupyter Notebook for image calibration involving rota
 1. Clone the repo:
    ```bash
    git clone https://github.com/username/repo-name.git
+
+
+## WORKING PROCEDURE FOR THE CALIBRATION PROCESS
+1. Rotated the PCD frame about its datum's x-axis so the ground was level using `1. Rotation about x-axis of original datum (0, 0, 0)` cell.
+2. Take the rotation matrix and assign into the calibration matrix of [R,0|t,1].
+3. Load the leveled data to pinpoint teh coordinate of teh desired new datum, take note of the coordinate and replace the value of translation vector in [R,0|t,1] matrix.
+4. Run `Applying whole calibration matrix` with noted value of the calibration matrix to the folder of uncalibrated (both rotated and translated) files.
+5. (OPTIONAL) Load scripts of `Differences between uncalibrated and calibrated files/folder viewer` to see the differences of coordinates, both new and old. This viewer is also can be use to verified the distance between marker of known real setup distance.
