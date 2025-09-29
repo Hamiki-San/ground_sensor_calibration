@@ -27,3 +27,6 @@ Thumbs.db
 
 # Data (optional — comment this out if you want to keep data files)
 data/
+
+*.drawio
+*.drawio.bkp
